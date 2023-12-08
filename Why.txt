@@ -1,0 +1,255 @@
+MongoDb atlas: 
+
+Developer data platform
+
+Database as a service (DBaaS) at its core
+Atlas manage the database and handle all the life cycle
+
+Replica server, A group of servers that hold your data
+in Atlas two types of database deployment, serverles instances and clusters
+A serverless instance scale on demand and only chrges us fo the resources
+serverless databases is a good choice with sparse an variable work loades
+A cluster is several mongodb servers that they work together
+there are two types of mongodb cluster 1-shared 2-dedicated
+
+when deploying the cluster on atlas  we can choose from different cloud
+providers aws, google cloud , microsft azure
+
+we can scale without any downtime
+
+other services of atlas: 
+atlas serach: enables us to build  reach search expiriences on top the application
+on the cloud
+
+atlas app services:
+it has data api that we can read and write data in atlas using http protocol
+it also include graphQL api, functions and triggers.
+
+in atlas account:
+Organization:Group and define users and teams
+Projects: Define and organize resources
+Create sepearte projects  for development, testing and production.
+
+after creating the atlas we need add our ip address to be able to connect to the database atlas and manipulate the data
+
+
+Mongo db atlas features and services
+
+
+Mongo db database: mongodb is genreal purpose document database, mongodb documents will be saves as a json object
+for example:
+
+{
+    "id": 1, //and integer datatype
+    "name" : {
+        "first" : "Ada",
+        "last" :  "lovelace" 
+    },
+    "title" : "the first porgrammer",
+    "interest" : ["Matematics", "Programming"] //an array of string datatype
+}
+
+
+
+Document model: Easier to plan how application data will correspond to data in the databse, Model data of any shape and structure
+
+Most common uses of Mongodb: E-commerce, Content management, IOT and time-series data, trading and payment, gaming, mobile apps, real-time anlytics and AI
+
+Document: The basic unit of data in mongodb, the documents displayed in the json format, stored in format BSON (Binary javaScript object notation)
+Collection: a group of documents
+Database: A collection for collections
+
+The mongodb database is at the core of mongo atlas
+
+object id is a special datatype in mongodb to create unique identifiers, Every document require and id field, which acts as a primary key.
+
+for schema change in mongodb we simply update our schema classes  to include the new fields and start inserting documents within the new schema.
+
+MongoDB has a flexible schema model, which means that documents in the same collection are not required to share a common structure of fields and value types by default.
+
+Atlas data explore: Interact and manage data from atlas UI.
+
+
+purpose of data modeling
+
+the question should I ask myself to model the data:
+What does my applicaton do?
+what data will i store?
+how will users access this data?
+what data will be the most valuable to me?
+A good data model can have:
+make it easier to mange the data
+make the queries more efficient
+use less memory and cpu
+reduce costs
+
+
+as the ruls to model the data : 
+data that is accessed toghether should be stored togheter, mongo db implements the flexible document data model
+each document in mongodb can have multiple forms which is called plimoriphism - mongodb is schema flexible
+Embeded document model allows us to build complex relationsships among the data.
+
+way of modeling the relationhsips:
+1- embedding --> we take the related data and insert it in out documents.
+2- Referencing --> we refer to  documents in another collection in our document. 
+
+
+structure the data to match the the ways the applicaton queries and updates it.
+common types of relationship in database
+1- one to one : one data entity in one set connect to exactly one data entity in another set
+2- one to many --> one of the best way to show the one to many relatoinship in a singe document is using the nested arrays
+3- many to many
+
+
+for example one to one relationship;
+{
+    "_id": ObjectId("00000001"),
+    "name": "Marnie Dupree",
+    "grade": "Freshman",
+    "studentId": 123456,
+    "email": "mdupree@college.edu"
+}
+
+
+we can represent relationships in many ways: by insreting data into the document, embedding it, or linking it with a reference.
+
+Embedding:
+ is used when we have one to many or many to many relaionships in the data that's being stored.
+ avoid applications joins
+ provieds better perfomrmance for read operaions
+ allows developers to update the related data in a single write operatiosn.
+ warning: 
+ Embedding data into the document makes to document in the future too big
+ storing large documents in the database can lead to execive memeory and latency for read. because large documents must read to the memory in full, witch can cause a 
+ slow application performance for our end user.
+ another problem of embedding the data to our document: --> Continuesly adding data without limit creates unbounded documents.
+ unbounded documents my exceed the bson document threshold of 16 mb.
+
+ for example
+ {
+    name : {firstname: "Arash", lastname : "Alghasi}
+ }
+
+
+ Referencing: 
+ save the id field of one document in another document as a link between two.
+ sufficient and simple for most use cases.
+ using references is called linking or data normalization.
+
+ avoids duplication of the data.
+ results smaller documents.
+ Querying from multiple document costs extra resources and impacts read performance.
+
+
+ for example 
+ {
+    "author": "Aileen Long",
+    "title": "Learn MongoDB in 30 Mins",
+    "published_date": ISODate("2020-05-18T14:10:30Z"),
+    "tags": ["mongodb", "introductory", "database", "nosql"],
+    "comments": [
+        {
+            "comment_id": "LM001",
+            "user_id": "AL001",
+            "comment_date": ISODate("2020-05-19T14:22:00Z"),
+            "comment": "Great read!"
+        },
+        {
+            "comment_id": "LM002",
+            "user_id": "AL002",
+            "comment_date": ISODate("2020-06-01T08:00:00Z"),
+            "comment": "So easy to understand - thanks!"
+        }
+    ]
+}
+
+Unbound documents are documents that grow infinitely.
+
+Avoid the document more than 16 MB size.
+Poor query performance.
+Poor write performance.
+too much memory being used.
+
+
+schema anti-pattern results:
+sub-optimal performance
+non-scalable solutions.
+
+common schema anti-pattern: 
+massive arrays.
+massive number of collections.
+bloated documents.
+unneccessay indexes
+queries without indexes
+data that access togheter but stored in defferent collections.
+
+
+two products that help us to find anti-patterns: 
+Data explorer, performance adviser.
+
+The mongodb cluster string allows us to connect to our cluster and work with our data. it describe a host that we'll using and the options for connecting to a mongodb 
+database.
+the connection string can be used to connect from mongo shell, mongodb compass or any other application. 
+mongo db supports two formats for connection string 
+1- a standard string  --> used to connect to standalone clusters, replica sets, or shared clusters.
+2- DNS seed list format  --> provides a DNS server list to our connection string, gives fleixbility of deployment
+
+Ability to change servers in rotation without the need to reconfigure the client.
+
+we can find the connection string in the atlas dashboard  --> connect
+
+connection string: 
+
+mongodb+srv://admin:<password>@myseconddb.eq1hcz3.mongodb.net/?retryWrites=true&w=majority
+
+srv edition --> automatically sets the tls security option to true and tell mongodb to use the DNS seed list.
+following the mongodb prefix there is username and password
+next there is host and optional port number and if the port is not specified mongodb will default port to 27017.
+the final piece of the string contains any options that we want to include such as connection timeo-out, TLS and SSL, connection pooling, and read and write concerns.
+in this string retryWrite is set to true this tells the mongodb drivers to automaticaly retry when certain types of write operation fails.
+
+Conncet to the cluster usign mongodb shell: 
+the command is like: mongosh "mongodb+srv://myseconddb.eq1hcz3.mongodb.net/" --apiVersion 1 --username admin
+follow the instruction written in the atlas dashboard includes installing mongosh 
+
+the mongodb shell is a node.js REPL environment, this give us access to javaScript variables, functions, loops, and control flow statement inside of the shell;
+for example we can define an Array --> const welcome = ["Welcome", "developer!"];
+then we can define a function ---> const loopArray = (array) => array.forEach(el => console.log(el));
+
+
+MongoDb compass is a graphical user interface , or GUI, that allows us to query and analyse our data, and compose aggregation pipeline.
+
+Mongodb drivers --> MongoDB drivers connect our application to our database by using a connection string 
+the languages suppoted by mongodb: C / c++ / c# / Go / java / kotlin / node.js/ php/ python / Ruby / Rust / Scala / Swift / typeScript
+future comminuity-supported libraries -- > Elixir, Mongooos, prisma, R 
+
+To know more --> see mongodb develper center: https://www.mongodb.com/developer/
+
+
+tow of the most connection errors: 
+1- Network access errors
+2- User authentication errors
+
+
+when you build a java application  that connects to mongodb , the application require a set of libraries to interact with your mongodb deployment.
+these libraries are refered to as the driveres. 
+Mongodb maintain official java drivers for synchronous or asynchronous application code. 
+in this video we use the synchronoius java driver 
+Mongodb drivers simplyfy connecting and interaction wiht their database from an application they establish secure connections to a mongodb cluseter and 
+execute databse operations on behalf of cllient application. 
+Additionaly, drivers allow you to specify connection options, these might include security setting, write durability, read isolation, and ...
+
+mongodb java application must use official drivers to ensure optimal perfomrmance, compatibility, and an easy upgrade path.
+
+
+download and install official java mongodb driver: by using maven
+we connect also a mongodb client instance in a job application to an atlas cluster by using a connection string. then we instantiate a single mongodbclient 
+that can be reused across all database request. 
+
+first we need to use maven to isntall the java driver
+
+
+to create a maven project we should type and after installing jdk and maven
+in command line we should type ---> mvn archetype:generate
+Archetype --> project template (files, directories, programming languages , libraries)
+artifactId ---> project name
