@@ -246,10 +246,78 @@ download and install official java mongodb driver: by using maven
 we connect also a mongodb client instance in a job application to an atlas cluster by using a connection string. then we instantiate a single mongodbclient 
 that can be reused across all database request. 
 
-first we need to use maven to isntall the java driver
+first we need to use maven to isntall the java mongodb driver
+connect to mongodb instance
+instantiate a single mongoClient
+
 
 
 to create a maven project we should type and after installing jdk and maven
 in command line we should type ---> mvn archetype:generate
 Archetype --> project template (files, directories, programming languages , libraries)
 artifactId ---> project name
+
+
+first we need to include the dependencies 
+https://www.mongodb.com/docs/drivers/java/sync/current/quick-start/
+
+
+  we need to configure the application to use the mongodb java synchronous driver 
+  in mongodb atlas we choose the connect your application
+
+  The atlas connection string is like ---> mongodb+srv://-----:<password>@-----.------.mongodb.net/?retryWrites=true&w=majority
+  includes protocol-username-password-host-options
+  The srv record includes information about the ports and target hosts in the replica set.
+
+  to connect the application to the mongodb cluseter 
+
+              ConnectionString ConnectionString = new ConnectionString(
+                    "mongodb+srv://-------:<password>@-----.------.mongodb.net/?retryWrites=true&w=majority");
+            MongoClientSettings settings = MongoClientSettings.builder() 
+                    .applyConnectionString(ConnectionString)
+                    .serverApi(ServerApi.builder()
+                            .version(ServerApiVersion.V1)
+                            .build())
+                    .build();
+            MongoClient mongoClient = MongoClients.create(settings);
+
+then when we put the command in the CLI : mvn compile exec:java -Dexec.mainClass="com.mongodb.QuickStart.Connection" -Dmongodb.uri="mongodb+srv://admin:<password>@myseconddb.eq1hcz3.mongodb.net/?retryWrites=true&w=majority"
+
+
+It is important to know that an application should use a single MangoClient
+instance for all the database requests
+
+Instantiating a MongoClient isntance is resource intensive
+
+A good approch is to use the singeltion desing pattern
+
+Private static MongoClient mongoClient;
+Private static synchronized MongoClient getMongoClient(){
+  if(mongoClient==null){
+                  ConnectionString ConnectionString = new ConnectionString(
+                    "mongodb+srv://-------:<password>@-----.------.mongodb.net/?retryWrites=true&w=majority");
+                                MongoClientSettings settings = MongoClientSettings.builder() 
+                    .applyConnectionString(ConnectionString)
+                    .serverApi(ServerApi.builder()
+                            .version(ServerApiVersion.V1)
+                            .build())
+                    .build();
+            MongoClient mongoClient = MongoClients.create(settings);
+  }
+  return mongoClient;
+}
+
+mvn compile exec:java -Dexec.mainClass="com.mongodb.quickstart.Connection" -Dmongodb.uri="<connectionString>"
+
+
+An application should use a single MongoClient instance for all the database requests. Instantiating a MongoClient instance 
+is resource intensive ----> One the way to implement is using Singelton design pattern
+
+
+then we need to instantiate our mongodb client isntance which for a whole program must be unique because instantiationg the 
+connection cost alot . 
+
+mongodb+srv://admin:<password>@myseconddb.eq1hcz3.mongodb.net/?retryWrites=true&w=majority
+
+
+To install the dependencies in maven ---> mvn clean install
