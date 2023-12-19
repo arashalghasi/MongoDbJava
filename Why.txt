@@ -321,3 +321,62 @@ mongodb+srv://admin:<password>@myseconddb.eq1hcz3.mongodb.net/?retryWrites=true&
 
 
 To install the dependencies in maven ---> mvn clean install
+
+Connectivity isuue to the mongodb cluster may be the result from systems put in place to protect the database like IP Address Access
+
+Common connection issues
+1- Atlas access restriction
+2- Invalid connection string format
+3- Incorrect Authentication
+4- FireWall misconfiguration
+5- Flawed Connection code 
+
+
+To practice try using CRUD Operations and Aggregation Pipeline using java
+
+
+To find the name of all databases ---> 
+
+            ConnectionString connectionString = new ConnectionString("mongodb+srv://arash:genova12345@mycluster.yf2nch3.mongodb.net/?retryWrites=true&w=majority");
+            MongoClient mongoClient = MongoClients.create(connectionString);
+            System.out.println("Successful database connection established. \n");
+
+            MongoCursor<String> cursor = mongoClient.listDatabaseNames().iterator();
+
+            System.out.println("Databases: ");
+            while(cursor.hasNext()){
+                System.out.println(" " + cursor.next());
+            }
+
+to select an specific database ---> 
+            MongoDatabase db = mongoClient.getDatabase("sample_airbnb");
+To select a specific document inside a database -->
+            MongoCollection<Document> collection = db.getCollection("listingsAndReviews");
+
+To show all record of an specific document
+
+            FindIterable<Document> documents = collection.find();
+            for(Document doc : documents){
+                System.out.println(doc);
+            }
+
+To show the specific records of a document
+
+            Document filter = new Document("name","Alghasi");
+            FindIterable<Document> findItems = arashCollection.find(filter);
+            for(Document item : findItems){
+                System.out.println(item);
+            }
+
+To create a document an insert on record 
+
+            //Creating collection or get the colleciton if exists
+            MongoCollection<Document> arashCollection = db.getCollection("Arash");
+            System.out.println("Collection Created!");
+            Document doc = new Document("name", "information");
+            doc.append("id", 4762847);
+            doc.append("subscriber", 100);
+            doc.append("name", "Arash");
+            doc.append("Surename", "Alghasi");
+            //arashCollection.insertOne(doc);
+            //To Retrive all records of a  document 
