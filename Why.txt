@@ -350,17 +350,17 @@ To find the name of all databases --->
 
 to select an specific database ---> 
             MongoDatabase db = mongoClient.getDatabase("sample_airbnb");
-To select a specific document inside a database -->
+To select a specific collection inside a database -->
             MongoCollection<Document> collection = db.getCollection("listingsAndReviews");
 
-To show all record of an specific document
+To show all record of an specific collection
 
             FindIterable<Document> documents = collection.find();
             for(Document doc : documents){
                 System.out.println(doc);
             }
 
-To show the specific records of a document
+To show the specific docueme t of a collection
 
             Document filter = new Document("name","Alghasi");
             FindIterable<Document> findItems = arashCollection.find(filter);
@@ -368,7 +368,7 @@ To show the specific records of a document
                 System.out.println(item);
             }
 
-To create a document an insert on record 
+To create a collection an insert a document 
 
             //Creating collection or get the colleciton if exists
             MongoCollection<Document> arashCollection = db.getCollection("Arash");
@@ -380,3 +380,547 @@ To create a document an insert on record
             doc.append("Surename", "Alghasi");
             //arashCollection.insertOne(doc);
             //To Retrive all records of a  document 
+
+To insert a document we have two options 
+1- insertOne
+2- insertmany
+
+To insert a document every document must have _id field and it's value must be unique
+if we do not provide an id field the mongo db automatically provide a unique id for the document
+
+we can find the documents in a collection using find
+$in operator allows us to select all documents that have a field value equal to any of the values
+specified in the array.
+$eq operator to find the documents with a field and value
+
+Find a Document with Equality
+When given equality with an _id field, the find() command will return the specified document that matches the _id. Here's an example:
+
+db.zips.find({ _id: ObjectId("5c8eccc1caa187d17ca6ed16") })
+Find a Document by Using the $in Operator
+Use the $in operator to select documents where the value of a field equals any value in the specified array. Here's an example:
+
+db.zips.find({ city: { $in: ["PHOENIX", "CHICAGO"] } })
+
+$gt
+Use the $gt operator to match documents with a field greater than the given value. For example:
+
+db.sales.find({ "items.price": { $gt: 50}})
+$lt
+Use the $lt operator to match documents with a field less than the given value. For example:
+
+db.sales.find({ "items.price": { $lt: 50}})
+$lte
+Use the $lte operator to match documents with a field less than or equal to the given value. For example:
+
+db.sales.find({ "customer.age": { $lte: 65}})
+$gte
+Use the $gte operator to match documents with a field greater than or equal to the given value. For example:
+
+db.sales.find({ "customer.age": { $gte: 65}})
+
+
+
+Find Documents with an Array That Contains a Specified Value
+In the following example, "InvestmentFund" is not enclosed in square brackets, so MongoDB returns all documents within the products array that contain the specified value.
+
+db.accounts.find({ products: "InvestmentFund"})
+Find a Document by Using the $elemMatch Operator
+Use the $elemMatch operator to find all documents that contain the specified subdocument. For example:
+
+db.sales.find({
+  items: {
+    $elemMatch: { name: "laptop", price: { $gt: 800 }, quantity: { $gte: 1 } },
+  },
+})
+
+
+
+Find a Document by Using Implicit $and
+Use implicit $and to select documents that match multiple expressions. For example:
+
+db.routes.find({ "airline.name": "Southwest Airlines", stops: { $gte: 1 } })
+Find a Document by Using the $or Operator
+Use the $or operator to select documents that match at least one of the included expressions. For example:
+
+db.routes.find({
+  $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }],
+})
+Find a Document by Using the $and Operator
+Use the $and operator to use multiple $or expressions in your query.
+
+db.routes.find({
+  $and: [
+    { $or: [{ dst_airport: "SEA" }, { src_airport: "SEA" }] },
+    { $or: [{ "airline.name": "American Airlines" }, { airplane: 320 }] },
+  ]
+})
+
+
+To connect to the mongodb using CLI 
+mongosh "mongodb+srv://mycluster.yf2nch3.mongodb.net/" --apiVersion 1 --username arash
+and then we insert the password
+to see all the databses ---> show dbs
+to select the desiered data base ---> use database_name
+print the currect database ---> db
+
+mongosh commands --->    
+    use                                        Set current database
+    show                                       'show databases'/'show dbs': Print a list of all available databases.
+                                               'show collections'/'show tables': Print a list of all collections for current database.
+                                               'show profile': Prints system.profile information.
+                                               'show users': Print a list of all users for current database.
+                                               'show roles': Print a list of all roles for current database.
+                                               'show log <type>': log for current connection, if type is not set uses 'global'
+                                               'show logs': Print all logs.
+
+db.coll.insertOne({name: "Max"})
+db.coll.insertMany([{name: "Max"}, {name:"Alex"}]) // ordered bulk insert
+db.coll.insertMany([{name: "Max"}, {name:"Alex"}], {ordered: false}) // unordered bulk insert
+db.coll.insertOne({date: ISODate()})
+db.coll.insertOne({name: "Max"}, {"writeConcern": {"w": "majority", "wtimeout": 5000}})   --->    { writeConcern: { w: "majority", wtimeout: 5000 } }: Specifies the write concern options for the operation. In this case, it indicates that the write should be acknowledged by the majority of the nodes with a timeout of 5000 milliseconds.
+
+
+
+
+db.coll.findOne() // returns a single document
+db.coll.find()    // returns a cursor - show 20 results - "it" to display more
+db.coll.find().pretty()
+db.coll.find({name: "Max", age: 32}) // implicit logical "AND".
+db.coll.find({date: ISODate("2020-09-25T13:57:17.180Z")})
+db.coll.find({name: "Max", age: 32}).explain("executionStats") // or "queryPlanner" or "allPlansExecution"
+db.coll.distinct("name")
+
+// Count
+db.coll.countDocuments({age: 32}) // alias for an aggregation pipeline - accurate count
+db.coll.estimatedDocumentCount()  // estimation based on collection metadata
+
+// Comparison
+db.coll.find({"year": {$gt: 1970}})
+db.coll.find({"year": {$gte: 1970}})
+db.coll.find({"year": {$lt: 1970}})
+db.coll.find({"year": {$lte: 1970}})
+db.coll.find({"year": {$ne: 1970}})
+db.coll.find({"year": {$in: [1958, 1959]}})
+db.coll.find({"year": {$nin: [1958, 1959]}})
+
+// Logical
+db.coll.find({name:{$not: {$eq: "Max"}}})
+db.coll.find({$or: [{"year" : 1958}, {"year" : 1959}]})
+db.coll.find({$nor: [{price: 1.99}, {sale: true}]})
+db.coll.find({
+  $and: [
+    {$or: [{qty: {$lt :10}}, {qty :{$gt: 50}}]},
+    {$or: [{sale: true}, {price: {$lt: 5 }}]}
+  ]
+})
+
+// Element
+db.coll.find({name: {$exists: true}})
+db.coll.find({"zipCode": {$type: 2 }})
+db.coll.find({"zipCode": {$type: "string"}})
+
+// Aggregation Pipeline
+db.coll.aggregate([
+  {$match: {status: "A"}},
+  {$group: {_id: "$cust_id", total: {$sum: "$amount"}}},
+  {$sort: {total: -1}}
+])
+
+// Text search with a "text" index
+db.coll.find({$text: {$search: "cake"}}, {score: {$meta: "textScore"}}).sort({score: {$meta: "textScore"}})
+
+// Regex
+db.coll.find({name: /^Max/})   // regex: starts by letter "M"
+db.coll.find({name: /^Max$/i}) // regex case insensitive
+
+// Array
+db.coll.find({tags: {$all: ["Realm", "Charts"]}})
+db.coll.find({field: {$size: 2}}) // impossible to index - prefer storing the size of the array & update it
+db.coll.find({results: {$elemMatch: {product: "xyz", score: {$gte: 8}}}})
+
+// Projections
+db.coll.find({"x": 1}, {"actors": 1})               // actors + _id
+db.coll.find({"x": 1}, {"actors": 1, "_id": 0})     // actors
+db.coll.find({"x": 1}, {"actors": 0, "summary": 0}) // all but "actors" and "summary"
+
+// Sort, skip, limit
+db.coll.find({}).sort({"year": 1, "rating": -1}).skip(10).limit(3)
+
+// Read Concern
+db.coll.find().readConcern("majority")
+
+
+
+db.coll.updateOne({"_id": 1}, {$set: {"year": 2016, name: "Max"}})
+db.coll.updateOne({"_id": 1}, {$unset: {"year": 1}})
+db.coll.updateOne({"_id": 1}, {$rename: {"year": "date"} })
+db.coll.updateOne({"_id": 1}, {$inc: {"year": 5}})
+db.coll.updateOne({"_id": 1}, {$mul: {price: NumberDecimal("1.25"), qty: 2}})
+db.coll.updateOne({"_id": 1}, {$min: {"imdb": 5}})
+db.coll.updateOne({"_id": 1}, {$max: {"imdb": 8}})
+db.coll.updateOne({"_id": 1}, {$currentDate: {"lastModified": true}})
+db.coll.updateOne({"_id": 1}, {$currentDate: {"lastModified": {$type: "timestamp"}}})
+
+// Array
+db.coll.updateOne({"_id": 1}, {$push :{"array": 1}})
+db.coll.updateOne({"_id": 1}, {$pull :{"array": 1}})
+db.coll.updateOne({"_id": 1}, {$addToSet :{"array": 2}})
+db.coll.updateOne({"_id": 1}, {$pop: {"array": 1}})  // last element
+db.coll.updateOne({"_id": 1}, {$pop: {"array": -1}}) // first element
+db.coll.updateOne({"_id": 1}, {$pullAll: {"array" :[3, 4, 5]}})
+db.coll.updateOne({"_id": 1}, {$push: {"scores": {$each: [90, 92]}}})
+db.coll.updateOne({"_id": 2}, {$push: {"scores": {$each: [40, 60], $sort: 1}}}) // array sorted
+db.coll.updateOne({"_id": 1, "grades": 80}, {$set: {"grades.$": 82}})
+db.coll.updateMany({}, {$inc: {"grades.$[]": 10}})
+db.coll.updateMany({}, {$set: {"grades.$[element]": 100}}, {multi: true, arrayFilters: [{"element": {$gte: 100}}]})
+
+// FindOneAndUpdate
+db.coll.findOneAndUpdate({"name": "Max"}, {$inc: {"points": 5}}, {returnNewDocument: true})
+
+// Upsert
+db.coll.updateOne({"_id": 1}, {$set: {item: "apple"}, $setOnInsert: {defaultQty: 100}}, {upsert: true})
+
+// Replace
+db.coll.replaceOne({"name": "Max"}, {"firstname": "Maxime", "surname": "Beugnet"})
+
+// Write concern
+db.coll.updateMany({}, {$set: {"x": 1}}, {"writeConcern": {"w": "majority", "wtimeout": 5000}})
+
+
+db.coll.deleteOne({name: "Max"})
+db.coll.deleteMany({name: "Max"}, {"writeConcern": {"w": "majority", "wtimeout": 5000}})
+db.coll.deleteMany({}) // WARNING! Deletes all the docs but not the collection itself and its index definitions
+db.coll.findOneAndDelete({"name": "Max"})   
+
+
+
+// Create collection with a $jsonschema
+db.createCollection("contacts", {
+   validator: {$jsonSchema: {
+      bsonType: "object",
+      required: ["phone"],
+      properties: {
+         phone: {
+            bsonType: "string",
+            description: "must be a string and is required"
+         },
+         email: {
+            bsonType: "string",
+            pattern: "@mongodb\.com$",
+            description: "must be a string and match the regular expression pattern"
+         },
+         status: {
+            enum: [ "Unknown", "Incomplete" ],
+            description: "can only be one of the enum values"
+         }
+      }
+   }}
+})
+
+
+
+db.coll.stats()
+db.coll.storageSize()
+db.coll.totalIndexSize()
+db.coll.totalSize()
+db.coll.validate({full: true})
+db.coll.renameCollection("new_coll", true) // 2nd parameter to drop the target collection if exists
+
+
+
+db.coll.getIndexes()
+db.coll.getIndexKeys()
+
+
+
+// Index Types
+db.coll.createIndex({"name": 1})                // single field index
+db.coll.createIndex({"name": 1, "date": 1})     // compound index
+db.coll.createIndex({foo: "text", bar: "text"}) // text index
+db.coll.createIndex({"$**": "text"})            // wildcard text index
+db.coll.createIndex({"userMetadata.$**": 1})    // wildcard index
+db.coll.createIndex({"loc": "2d"})              // 2d index
+db.coll.createIndex({"loc": "2dsphere"})        // 2dsphere index
+db.coll.createIndex({"_id": "hashed"})          // hashed index
+
+// Index Options
+db.coll.createIndex({"lastModifiedDate": 1}, {expireAfterSeconds: 3600})      // TTL index
+db.coll.createIndex({"name": 1}, {unique: true})
+db.coll.createIndex({"name": 1}, {partialFilterExpression: {age: {$gt: 18}}}) // partial index
+db.coll.createIndex({"name": 1}, {collation: {locale: 'en', strength: 1}})    // case insensitive index with strength = 1 or 2
+db.coll.createIndex({"name": 1 }, {sparse: true})
+
+//drop index
+db.coll.dropIndex("name_1")
+
+
+
+
+use admin
+db.createUser({"user": "root", "pwd": passwordPrompt(), "roles": ["root"]})
+db.dropUser("root")
+db.auth( "user", passwordPrompt() )
+
+use test
+db.getSiblingDB("dbname")
+db.currentOp()
+db.killOp(123) // opid
+
+db.fsyncLock()
+db.fsyncUnlock()
+
+db.getCollectionNames()
+db.getCollectionInfos()
+db.printCollectionStats()
+db.stats()
+
+db.getReplicationInfo()
+db.printReplicationInfo()
+db.hello()
+db.hostInfo()
+
+db.shutdownServer()
+db.serverStatus()
+
+db.getProfilingStatus()
+db.setProfilingLevel(1, 200) // 0 == OFF, 1 == ON with slowms, 2 == ON
+
+db.enableFreeMonitoring()
+db.disableFreeMonitoring()
+db.getFreeMonitoringStatus()
+
+db.createView("viewName", "sourceColl", [{$project:{department: 1}}])
+
+
+
+Sharded Cluster
+db.printShardingStatus()
+
+sh.status()
+sh.addShard("rs1/mongodb1.example.net:27017")
+sh.shardCollection("mydb.coll", {zipcode: 1})
+
+sh.moveChunk("mydb.coll", { zipcode: "53187" }, "shard0019")
+sh.splitAt("mydb.coll", {x: 70})
+sh.splitFind("mydb.coll", {x: 70})
+
+sh.startBalancer()
+sh.stopBalancer()
+sh.disableBalancing("mydb.coll")
+sh.enableBalancing("mydb.coll")
+sh.getBalancerState()
+sh.setBalancerState(true/false)
+sh.isBalancerRunning()
+
+sh.startAutoMerger()
+sh.stopAutoMerger()
+sh.enableAutoMerger()
+sh.disableAutoMerger()
+
+sh.updateZoneKeyRange("mydb.coll", {state: "NY", zip: MinKey }, { state: "NY", zip: MaxKey }, "NY")
+sh.removeRangeFromZone("mydb.coll", {state: "NY", zip: MinKey }, { state: "NY", zip: MaxKey })
+sh.addShardToZone("shard0000", "NYC")
+sh.removeShardFromZone("shard0000", "NYC")
+
+
+Updating MongoDB Documents by Using updateOne()
+The updateOne() method accepts a filter document, an update document, and an optional options object. MongoDB provides update operators and options to help you update documents. In this section, we'll cover three of them: $set, upsert, and $push.
+
+$set
+The $set operator replaces the value of a field with the specified value, as shown in the following code:
+
+db.podcasts.updateOne(
+  {
+    _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8"),
+  },
+
+  {
+    $set: {
+      subscribers: 98562,
+    },
+  }
+)
+upsert
+The upsert option creates a new document if no documents match the filtered criteria. Here's an example:
+
+db.podcasts.updateOne(
+  { title: "The Developer Hub" },
+  { $set: { topics: ["databases", "MongoDB"] } },
+  { upsert: true }
+)
+$push
+The $push operator adds a new value to the hosts array field. Here's an example:
+
+db.podcasts.updateOne(
+  { _id: ObjectId("5e8f8f8f8f8f8f8f8f8f8f8") },
+  { $push: { hosts: "Nic Raboy" } }
+)
+
+
+Updating MongoDB Documents by Using findAndModify()
+The findAndModify() method is used to find and replace a single document in MongoDB. It accepts a filter document, a replacement document, and an optional options object. The following code shows an example:
+
+db.podcasts.findAndModify({
+  query: { _id: ObjectId("6261a92dfee1ff300dc80bf1") },
+  update: { $inc: { subscribers: 1 } },
+  new: true,
+})
+
+
+Updating MongoDB Documents by Using updateMany()
+To update multiple documents, use the updateMany() method. This method accepts a filter document, an update document, and an optional options object. The following code shows an example:
+
+db.books.updateMany(
+  { publishedDate: { $lt: new Date("2019-01-01") } },
+  { $set: { status: "LEGACY" } }
+)
+
+
+Deleting Documents in MongoDB
+To delete documents, use the deleteOne() or deleteMany() methods. Both methods accept a filter document and an options object.
+
+Delete One Document
+The following code shows an example of the deleteOne() method:
+
+db.podcasts.deleteOne({ _id: Objectid("6282c9862acb966e76bbf20a") })
+Delete Many Documents
+The following code shows an example of the deleteMany() method:
+
+db.podcasts.deleteMany({category: “crime”})
+
+
+Cursor --> Pointer to the set of a query
+find() method returns a cursor and points to the documents that match that query
+cursor methods which they are chained to queries 
+perform actions on the resulting set
+
+
+Review the following code, which demonstrates how to sort and limit query results.
+
+Sorting Results
+Use cursor.sort() to return query results in a specified order. Within the parentheses of sort(), include an object that specifies the field(s) to sort by and the order of the sort. Use 1 for ascending order, and -1 for descending order.
+
+Syntax:
+
+db.collection.find(<query>).sort(<sort>)
+Example:
+
+// Return data on all music companies, sorted alphabetically from A to Z.
+db.companies.find({ category_code: "music" }).sort({ name: 1 });
+To ensure documents are returned in a consistent order, include a field that contains unique values in the sort. An easy way to do this is to include the _id field in the sort. Here's an example:
+
+// Return data on all music companies, sorted alphabetically from A to Z. Ensure consistent sort order
+db.companies.find({ category_code: "music" }).sort({ name: 1, _id: 1 });
+Limiting Results
+Use cursor.limit() to return query results in a specified order. Within the parentheses of limit(), specify the maximum number of documents to return.
+
+Syntax:
+
+db.companies.find(<query>).limit(<number>)
+Example:
+
+// Return the three music companies with the highest number of employees. Ensure consistent sort order.
+db.companies
+  .find({ category_code: "music" })
+  .sort({ number_of_employees: -1, _id: 1 })
+  .limit(3);
+
+
+Returning Specific Data from a Query in MongoDB
+Review the following code, which demonstrates how to return selected fields from a query.
+
+Add a Projection Document
+To specify fields to include or exclude in the result set, add a projection document as the second parameter in the call to db.collection.find().
+
+Syntax:
+
+db.collection.find( <query>, <projection> )
+Include a Field
+To include a field, set its value to 1 in the projection document.
+
+Syntax:
+
+db.collection.find( <query>, { <field> : 1 })
+Example:
+
+// Return all restaurant inspections - business name, result, and _id fields only
+db.inspections.find(
+  { sector: "Restaurant - 818" },
+  { business_name: 1, result: 1 }
+)
+Exclude a Field
+To exclude a field, set its value to 0 in the projection document.
+
+Syntax:
+
+db.collection.find(query, { <field> : 0, <field>: 0 })
+Example:
+
+// Return all inspections with result of "Pass" or "Warning" - exclude date and zip code
+db.inspections.find(
+  { result: { $in: ["Pass", "Warning"] } },
+  { date: 0, "address.zip": 0 }
+)
+While the _id field is included by default, it can be suppressed by setting its value to 0 in any projection.
+
+// Return all restaurant inspections - business name and result fields only
+db.inspections.find(
+  { sector: "Restaurant - 818" },
+  { business_name: 1, result: 1, _id: 0 }
+)
+
+
+
+Which of the following statements are true about a projection document? (Select all that apply.)
+
+A. We can include fields in our results by setting their values to 1 in the projection document.
+B. We can exclude fields from our results by setting their values to 0 in the projection document.
+C. We can either include or exclude fields in the results, but not both. The _id field is the exception to this rule.
+
+
+Using mongodb extension in vs code
+
+using playground:
+a playground is a resueable scripting environment for mongoDB, just like the mongoDB shell, it is based on javaScript and can be used interactively.
+
+
+we can use playground for prototype changes and build a reusable script
+
+
+Scripting in playground to create a new database and a collection
+
+const dataBase = 'Peaple_Muscat';
+const collection = 'persons';
+
+use(dataBase);
+
+db.createCollection(collection);
+
+To insert many documents
+
+const porductData = [
+    { name: "Arash", Surname: "Alghai", age: 28 },
+    { name: "Atefeh", Surname: "Alghai", age: 38 },
+    { name: "Azadeh", Surname: "Alghai", age: 36 },
+    { name: "Shirin", Surname: "Ghasemi", age: 60 },
+    { name: "Ezatollah", Surname: "Alghai", age: 62 }
+];
+
+
+db.collection.insertMany(porductData);
+
+console.log(`${dataBase},${collection} has ${db.collection.countDocuments()} documents.`);
+
+db.collection.find();
+
+BSON is optimized for storage , retrival and trasmission accross the wire.
+
+BSON is more secure than plain text json 
+
+
+Bson supports more data type that json
+
+The document class provides flexible and concise data rapresentation 
+
+always use the correct data types for your field values.
